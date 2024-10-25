@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Тамагочи</title>
+    <style>
+        /* Ваши стили */
+    </style>
+</head>
+<body>
+    <div class="game">
+        <h2>Ваш питомец</h2>
+        <div class="status">
+            <p>Сытость: <span id="hunger">100</span></p>
+            <p>Счастье: <span id="happiness">100</span></p>
+            <p>Монетки: <span id="coins">0</span></p>
+        </div>
+        <div class="actions">
+            <button onclick="feed()">Покормить</button>
+            <button onclick="play()">Поиграть</button>
+            <button onclick="earnCoins()">Заработать монетки</button>
+        </div>
+    </div>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        let hunger = 100;
+        let happiness = 100;
+        let coins = 0;
+
+        function updateStatus() {
+            document.getElementById("hunger").innerText = hunger;
+            document.getElementById("happiness").innerText = happiness;
+            document.getElementById("coins").innerText = coins;
+        }
+
+        function sendData() {
+            fetch('/webapp/data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_id: Telegram.WebApp.initDataUnsafe.user.id,
+                    hunger: hunger,
+                    happiness: happiness,
+                    coins: coins
+                })
+            }).then(response => response.json())
+              .then(data => console.log(data));
+        }
+
+        function feed() {
+            hunger = Math.min(hunger + 10, 100);
+            sendData();
+            updateStatus();
+        }
+
+        function play() {
+            happiness = Math.min(happiness + 10, 100);
+            sendData();
+            updateStatus();
+        }
+
+        function earnCoins() {
+            coins += 10;
+            sendData();
+            updateStatus();
+        }
+
+        Telegram.WebApp.ready();
+    </script>
+</body>
+</html>
